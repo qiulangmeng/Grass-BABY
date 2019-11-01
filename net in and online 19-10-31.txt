@@ -1,0 +1,123 @@
+select sum(*) sum from net_check_veh_day; //车辆总数
+
+
+select sum(*) some net_check_veh_day where gps_amount>0; //上网
+select count(vehicle_id) from () online
+
+//上线率=入网且gps_amount>120除以gps_amount>0												正确
+select s2/s1 from 
+(select count(vehicle_id) s2 from 
+	(select distinct vehicle_id  from 
+	net_check_veh_day ntvd,
+	vehicle_province vp 
+where ntvd.vehicle_id=vp.vehicleId and 
+	gps_amount>119 and 
+	stat_day<=20190930 and 
+	vp.status=0) reptotal) total,
+(select count(vehicle_id) s1 from 
+	(select distinct vehicle_id  from 
+	net_check_veh_day ntvd,
+	vehicle_province vp 
+where ntvd.vehicle_id=vp.vehicleId and 
+	gps_amount>0 and 
+	stat_day<=20190930 and 
+	vp.status=0) reponline) online;    	0.9965
+	
+	
+	//入网率=入网gps_amout>0除以运营车辆数																正确
+	
+	elect s2/s1 from 
+(select count(vehicleId) s1 from 
+	(select distinct vehicleId from vehicle_province where createTime<'2019-10-01 00:00:00' and status=0) reptotal) total,
+(select count(vehicle_id) s2 from 
+	(select distinct vehicle_id  from 
+	net_check_veh_day ntvd,
+	vehicle_province vp 
+where ntvd.vehicle_id=vp.vehicleId and 
+	gps_amount>0 and 
+	stat_day<=20190930 and 
+	vp.status=0) reponline) online; 			0.9908
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+alarm_stat_veh_day
+sum_stat_veh_day
+net_check_veh_day
+
+select distinct vehicle_id s2 from alarm_stat_veh_day where gps_amount>0 and stat_day<=20190930
+
+
+
+select distinct vehicle_id from vehicle_extend where create_time<=20190930   483
+
+
+select distinct vehicle_id  from alarm_stat_veh_day where gps_amount>0 and stat_day<=20190930   36
+
+
+
+
+
+
+select distinct vehicle_id  from net_check_veh_day where gps_amount>0 and stat_day<=20190930;  44730
+
+select distinct vehicleId from vehicle_province where createTime<'2019-10-01 00:00:00';		47631
+
+
+
+select distinct vehicle_id  from net_check_veh_day where gps_amount>0 and stat_day>=20190901 and stat_day<=20190930;   41742
+
+select distinct vehicleId from vehicle_province where createTime<='2019-09-30 23:59:59';	     47284
+
+
+
+select distinct vehicle_id  from 
+	net_check_veh_day ntvd,
+	vehicle_province vp 
+where ntvd.vehicle_id=vp.vehicleId and 
+	gps_amount>0 and 
+	stat_day<=20190930 and 
+	vp.status=0;      39705
+	
+	
+	
+	
+
+	
+	
+	
+	
+select distinct vehicleId from vehicle_province where createTime<'2019-10-01 00:00:00' and status=0;   40073
+
+
+
+select distinct vehicle_id  from 
+	net_check_veh_day ntvd,
+	vehicle_province vp 
+where ntvd.vehicle_id=vp.vehicleId and 
+	gps_amount>119 and 
+	stat_day<=20190930 and 
+	vp.status=0;				39566
+
+
+
+
+
+
+
+
+
+gps分析代码解读
+1：将相同RDD中的gpsModel加入Set数据结构
+2:返回元组（String，Set[models]）//车辆id加日期为key， 统一RDD的gpsModel为value
+3:reduceByKey 同一车辆的同一天的所有gps
+
+
